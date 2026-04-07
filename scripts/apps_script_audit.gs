@@ -1,12 +1,13 @@
 /**
  * When any of the first four worksheets (left-to-right tab order) is edited,
- * writes the same timestamp into column AZ for every row touched by the edit.
+ * writes the same UTC timestamp (text) into column AZ for every row touched.
  * Column AZ = 52 (A=1 … Z=26, AA=27 … AZ=52).
  */
 
 var FIRST_SHEET_COUNT = 4;
 var COL_AZ = 52;
-var TS_FORMAT = "yyyy-MM-dd HH:mm:ss";
+/** IANA timezone for UTC (Apps Script accepts GMT for formatDate). */
+var TZ_UTC = "GMT";
 
 function onEdit(e) {
   handleFirstFourSheetAzTimestamp(e);
@@ -32,14 +33,15 @@ function handleFirstFourSheetAzTimestamp(e) {
     if (numRows < 1) return;
 
     var now = new Date();
+    var utcStamp =
+      Utilities.formatDate(now, TZ_UTC, "yyyy-MM-dd'T'HH:mm:ss") + "Z";
     var values = [];
     for (var i = 0; i < numRows; i++) {
-      values.push([now]);
+      values.push([utcStamp]);
     }
 
     var azRange = sh.getRange(startRow, COL_AZ, numRows, 1);
     azRange.setValues(values);
-    azRange.setNumberFormat(TS_FORMAT);
   } catch (error) {
     // Keep silent to avoid user-facing interruption in sheet edits.
   }

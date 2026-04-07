@@ -50,7 +50,7 @@ Open:
 The bundled script [`scripts/apps_script_audit.gs`](scripts/apps_script_audit.gs) no longer maintains an `audit_ew` sheet. It only:
 
 - Applies to the **first four worksheets** in the workbook (**left-to-right tab order**, indices 0–3). Put your main data tabs first so this matches your process (e.g. quote / order / BOL / POD).
-- On any edit in those sheets, sets **column AZ** (column 52) on **every row** included in the edited range to the **same** `Date` timestamp, with display format `yyyy-MM-dd HH:mm:ss`.
+- On any edit in those sheets, sets **column AZ** (column 52) on **every row** included in the edited range to the **same** **UTC** time as plain text, e.g. `2026-04-07T12:34:56Z` (ISO-8601 with `Z`).
 
 Setup:
 
