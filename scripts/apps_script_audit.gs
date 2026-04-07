@@ -22,7 +22,8 @@ function handleAuditEdit(e) {
     // EWid: display value in column C on the edited row.
     var ewId = String(
       sourceSheet.getRange(e.range.getRow(), 3).getDisplayValue() || ""
-    );
+    ).trim();
+    if (!ewId) return;
 
     var auditSheet = sourceSpreadsheet.getSheetByName(AUDIT_TAB);
     if (!auditSheet) {

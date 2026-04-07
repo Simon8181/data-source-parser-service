@@ -49,6 +49,8 @@ Open:
 
 The UI shows **only** `EWid` (column **C** on the edited row) and **ISO time** of the edit.
 
+Edits are **not** logged when column C is empty (no EWid).
+
 1. Open your target Google Sheet.
 2. Go to `Extensions` -> `Apps Script`.
 3. Paste script from `scripts/apps_script_audit.gs`.
