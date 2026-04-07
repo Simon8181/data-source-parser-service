@@ -26,7 +26,7 @@ class SettingsService:
                 "worksheet_name": "",
                 "google_api_key": "",
                 "audit_sheet_id": "",
-                "audit_worksheet_name": "audit_log",
+                "audit_worksheet_name": "audit_ew",
                 "credentials_uploaded": False,
                 "credentials_updated_at": "",
             }

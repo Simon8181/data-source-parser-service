@@ -32,7 +32,7 @@ async def save_settings(
     sheet_id: str = Form(...),
     worksheet_name: str = Form(...),
     audit_sheet_id: str = Form(""),
-    audit_worksheet_name: str = Form("audit_log"),
+    audit_worksheet_name: str = Form("audit_ew"),
     google_api_key: str = Form(""),
     credentials_file: UploadFile | None = File(None),
 ):
@@ -42,7 +42,7 @@ async def save_settings(
     runtime["sheet_id"] = sheet_id.strip()
     runtime["worksheet_name"] = worksheet_name.strip()
     runtime["audit_sheet_id"] = audit_sheet_id.strip()
-    runtime["audit_worksheet_name"] = audit_worksheet_name.strip() or "audit_log"
+    runtime["audit_worksheet_name"] = audit_worksheet_name.strip() or "audit_ew"
     runtime["google_api_key"] = google_api_key.strip()
     service.save_runtime_config(runtime)
 

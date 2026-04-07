@@ -3,7 +3,7 @@ from app.services.history_service import HistoryService
 
 class DummySettings:
     audit_sheet_id = ""
-    audit_worksheet_name = "audit_log"
+    audit_worksheet_name = "audit_ew"
 
 
 def test_history_no_sheet_returns_empty(monkeypatch):

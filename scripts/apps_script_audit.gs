@@ -1,3 +1,5 @@
+var AUDIT_TAB = "audit_ew";
+
 function onEdit(e) {
   handleAuditEdit(e);
 }
@@ -15,42 +17,20 @@ function handleAuditEdit(e) {
     var sourceSpreadsheet = sourceSheet.getParent();
     var sourceSheetName = sourceSheet.getName();
 
-    // Do not log edits made in the audit worksheet itself.
-    if (sourceSheetName === "audit_log") return;
+    if (sourceSheetName === AUDIT_TAB) return;
 
-    var userEmail = "";
-    try {
-      userEmail = Session.getActiveUser().getEmail() || "unknown";
-    } catch (err) {
-      userEmail = "unknown";
-    }
+    // EWid: display value in column E on the edited row.
+    var ewId = String(
+      sourceSheet.getRange(e.range.getRow(), 5).getDisplayValue() || ""
+    );
 
-    var oldValue = typeof e.oldValue === "undefined" ? "" : String(e.oldValue);
-    var newValue = typeof e.value === "undefined" ? "" : String(e.value);
-
-    var auditSheet = sourceSpreadsheet.getSheetByName("audit_log");
+    var auditSheet = sourceSpreadsheet.getSheetByName(AUDIT_TAB);
     if (!auditSheet) {
-      auditSheet = sourceSpreadsheet.insertSheet("audit_log");
-      auditSheet.appendRow([
-        "time",
-        "actor",
-        "action",
-        "sheet_name",
-        "cell_a1",
-        "old_value",
-        "new_value",
-      ]);
+      auditSheet = sourceSpreadsheet.insertSheet(AUDIT_TAB);
+      auditSheet.appendRow(["time", "ew_id"]);
     }
 
-    auditSheet.appendRow([
-      new Date().toISOString(),
-      userEmail,
-      "edit",
-      sourceSheetName,
-      e.range.getA1Notation(),
-      oldValue,
-      newValue,
-    ]);
+    auditSheet.appendRow([new Date().toISOString(), ewId]);
   } catch (error) {
     // Keep silent to avoid user-facing interruption in sheet edits.
   }

@@ -45,19 +45,21 @@ Open:
 - Click `Validate current config`
 - Open `http://localhost:8000/history`
 
-## 3.1) Enable near real-time audit history (Apps Script)
+## 3.1) EWid + modified time (Apps Script audit sheet)
 
-Drive Activity can be delayed. For faster history, create an audit worksheet and log every edit:
+The UI shows **only** `EWid` (column **E** on the edited row) and **ISO time** of the edit.
 
 1. Open your target Google Sheet.
 2. Go to `Extensions` -> `Apps Script`.
 3. Paste script from `scripts/apps_script_audit.gs`.
-4. Save, then run once to grant permission.
-5. In this service settings page:
+4. Save, grant permission when prompted.
+5. In Settings:
    - `audit_sheet_id`: usually same as main `sheet_id`
-   - `audit_worksheet_name`: `audit_log`
+   - `audit_worksheet_name`: `audit_ew` (script creates this tab with columns `time`, `ew_id`)
 
-The history page will then show audit rows (near real-time) plus Drive Activity events.
+If audit is **not** configured, the history API falls back to Drive Activity (no EWid column).
+
+The old `audit_log` multi-column format is no longer used by the bundled script; use `audit_ew` for a clean two-column log.
 
 ## 4) API endpoints
 

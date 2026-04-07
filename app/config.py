@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # Optional sheet audit log source.
     audit_sheet_id: str = ""
-    audit_worksheet_name: str = "audit_log"
+    audit_worksheet_name: str = "audit_ew"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

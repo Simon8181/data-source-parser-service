@@ -25,18 +25,18 @@ class SheetAuditClient:
         results: list[dict[str, Any]] = []
 
         for row in records[:page_size]:
+            ew_id = str(
+                row.get("ew_id", row.get("EWid", row.get("e_wid", "")))
+            )
+            time_val = str(row.get("time", ""))
+            minimal = {"time": time_val, "ew_id": ew_id}
             results.append(
                 {
                     "source": "sheet_audit",
-                    "actor": str(row.get("actor", "unknown")),
-                    "action": str(row.get("action", "edit")),
-                    "time": str(row.get("time", "")),
-                    "sheet_name": str(row.get("sheet_name", "")),
-                    "cell_a1": str(row.get("cell_a1", "")),
-                    "old_value": str(row.get("old_value", "")),
-                    "new_value": str(row.get("new_value", "")),
+                    "time": time_val,
+                    "ew_id": ew_id,
                     "raw": row,
-                    "raw_pretty": json.dumps(row, ensure_ascii=False, indent=2),
+                    "raw_pretty": json.dumps(minimal, ensure_ascii=False, indent=2),
                 }
             )
         return results

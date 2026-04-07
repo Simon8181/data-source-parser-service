@@ -22,10 +22,12 @@ class HistoryService:
 
         audit_sheet_id = runtime.get("audit_sheet_id", "") or self.settings.audit_sheet_id or ""
         audit_worksheet_name = (
-            runtime.get("audit_worksheet_name", "") or self.settings.audit_worksheet_name or "audit_log"
+            runtime.get("audit_worksheet_name", "")
+            or self.settings.audit_worksheet_name
+            or "audit_ew"
         )
 
-        # Prefer audit source first for near real-time updates.
+        # When audit is configured: only EWid + time from the audit sheet (no Drive Activity).
         if audit_sheet_id and audit_worksheet_name:
             try:
                 audit_client = SheetAuditClient(sa_info)
@@ -36,12 +38,12 @@ class HistoryService:
                 )
             except Exception:
                 pass
-
-        try:
-            drive_client = DriveActivityClient(sa_info)
-            events.extend(drive_client.list_activity(sheet_id, page_size=limit))
-        except Exception:
-            pass
+        else:
+            try:
+                drive_client = DriveActivityClient(sa_info)
+                events.extend(drive_client.list_activity(sheet_id, page_size=limit))
+            except Exception:
+                pass
 
         events.sort(key=lambda x: x.get("time", ""), reverse=True)
         return events[:limit]

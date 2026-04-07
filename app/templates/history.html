@@ -6,42 +6,28 @@
   <title>Sheet History</title>
 </head>
 <body>
-  <h1>Sheet History</h1>
+  <h1>Edit history (EWid + time)</h1>
   <p>Showing latest {{ limit }} records.</p>
   <p><a href="/settings">Back to settings</a></p>
   <table border="1" cellpadding="6" cellspacing="0">
     <thead>
       <tr>
-        <th>Time</th>
-        <th>Actor</th>
-        <th>Action</th>
-        <th>Source</th>
-        <th>Sheet Name</th>
-        <th>Cell (A1)</th>
-        <th>Old Value</th>
-        <th>New Value</th>
-        <th>Raw Payload</th>
+        <th>Modified time</th>
+        <th>EWid</th>
       </tr>
     </thead>
     <tbody>
       {% for event in events %}
       <tr>
-        <td>{{ event.time }}</td>
-        <td>{{ event.actor }}</td>
-        <td>{{ event.action }}</td>
-        <td>{{ event.source }}</td>
-        <td>{{ event.sheet_name | default('', true) }}</td>
-        <td>{{ event.cell_a1 | default('', true) }}</td>
-        <td>{{ event.old_value | default('', true) }}</td>
-        <td>{{ event.new_value | default('', true) }}</td>
-        <td><pre style="white-space: pre-wrap; margin: 0;">{{ event.raw_pretty }}</pre></td>
+        <td>{{ event.time | default('', true) }}</td>
+        <td>{{ event.ew_id | default('', true) }}</td>
       </tr>
       {% endfor %}
       {% if not events %}
       <tr>
-        <td colspan="9">
-          No history records yet. Settings may already be correct.
-          Try editing the sheet, wait 30-60 seconds, then refresh this page.
+        <td colspan="2">
+          No records yet. Configure audit in Settings (audit sheet + worksheet
+          <code>audit_ew</code>), paste Apps Script, then edit a data row and refresh.
         </td>
       </tr>
       {% endif %}
