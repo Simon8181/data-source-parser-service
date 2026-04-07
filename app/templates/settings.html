@@ -8,6 +8,12 @@
 <body>
   <h1>Google Sheet Configuration</h1>
   <p>Project: {{ gcp_project_id }} | Secret: {{ gcp_secret_name }}</p>
+  <p>
+    Credentials uploaded: <strong>{{ credential_status.uploaded }}</strong>
+    {% if credential_status.updated_at %}
+    | last updated (UTC): <strong>{{ credential_status.updated_at }}</strong>
+    {% endif %}
+  </p>
   <form action="/settings" method="post" enctype="multipart/form-data">
     <label>Sheet ID</label><br />
     <input name="sheet_id" value="{{ settings.sheet_id }}" required /><br /><br />
@@ -15,11 +21,18 @@
     <label>Worksheet Name</label><br />
     <input name="worksheet_name" value="{{ settings.worksheet_name }}" required /><br /><br />
 
+    <label>Audit Sheet ID (optional, for near real-time)</label><br />
+    <input name="audit_sheet_id" value="{{ settings.audit_sheet_id }}" /><br /><br />
+
+    <label>Audit Worksheet Name</label><br />
+    <input name="audit_worksheet_name" value="{{ settings.audit_worksheet_name or 'audit_log' }}" /><br /><br />
+
     <label>Google API Key (optional)</label><br />
     <input name="google_api_key" value="{{ settings.google_api_key }}" /><br /><br />
 
     <label>Service Account JSON file</label><br />
-    <input type="file" name="credentials_file" accept=".json" required /><br /><br />
+    <input type="file" name="credentials_file" accept=".json" /><br />
+    <small>Only upload when replacing existing credentials.</small><br /><br />
 
     <button type="submit">Save</button>
   </form>

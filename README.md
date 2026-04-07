@@ -41,8 +41,23 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 Open:
 - `http://localhost:8000/settings`
 - Upload service account JSON, set `sheet_id` and `worksheet_name`
+- (Recommended) set `audit_sheet_id` + `audit_worksheet_name` for near real-time history
 - Click `Validate current config`
 - Open `http://localhost:8000/history`
+
+## 3.1) Enable near real-time audit history (Apps Script)
+
+Drive Activity can be delayed. For faster history, create an audit worksheet and log every edit:
+
+1. Open your target Google Sheet.
+2. Go to `Extensions` -> `Apps Script`.
+3. Paste script from `scripts/apps_script_audit.gs`.
+4. Save, then run once to grant permission.
+5. In this service settings page:
+   - `audit_sheet_id`: usually same as main `sheet_id`
+   - `audit_worksheet_name`: `audit_log`
+
+The history page will then show audit rows (near real-time) plus Drive Activity events.
 
 ## 4) API endpoints
 

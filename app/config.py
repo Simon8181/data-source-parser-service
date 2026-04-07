@@ -15,6 +15,8 @@ class Settings(BaseSettings):
 
     # Config metadata on local disk (non-secret).
     local_config_file: Path = Path("config/runtime_settings.json")
+    # Local fallback for service account json when GCP ADC is unavailable.
+    local_service_account_file: Path = Path("config/service_account.json")
 
     gcp_project_id: str = ""
     gcp_secret_name: str = "sheet-service-account-json"

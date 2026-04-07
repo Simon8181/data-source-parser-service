@@ -16,6 +16,11 @@
         <th>Actor</th>
         <th>Action</th>
         <th>Source</th>
+        <th>Sheet Name</th>
+        <th>Cell (A1)</th>
+        <th>Old Value</th>
+        <th>New Value</th>
+        <th>Raw Payload</th>
       </tr>
     </thead>
     <tbody>
@@ -25,11 +30,19 @@
         <td>{{ event.actor }}</td>
         <td>{{ event.action }}</td>
         <td>{{ event.source }}</td>
+        <td>{{ event.sheet_name | default('', true) }}</td>
+        <td>{{ event.cell_a1 | default('', true) }}</td>
+        <td>{{ event.old_value | default('', true) }}</td>
+        <td>{{ event.new_value | default('', true) }}</td>
+        <td><pre style="white-space: pre-wrap; margin: 0;">{{ event.raw_pretty }}</pre></td>
       </tr>
       {% endfor %}
       {% if not events %}
       <tr>
-        <td colspan="4">No history found. Please configure settings first.</td>
+        <td colspan="9">
+          No history records yet. Settings may already be correct.
+          Try editing the sheet, wait 30-60 seconds, then refresh this page.
+        </td>
       </tr>
       {% endif %}
     </tbody>

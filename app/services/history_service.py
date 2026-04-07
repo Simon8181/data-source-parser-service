@@ -11,25 +11,21 @@ class HistoryService:
         self.settings = settings
         self.settings_service = SettingsService(settings)
 
-    def get_history(self, limit: int = 50) -> list[dict[str, str]]:
+    def get_history(self, limit: int = 50) -> list[dict[str, Any]]:
         runtime = self.settings_service.load_runtime_config()
         sheet_id = runtime.get("sheet_id", "")
-        worksheet_name = runtime.get("worksheet_name", "")
         if not sheet_id:
             return []
 
         sa_info: dict[str, Any] = self.settings_service.get_service_account_json()
-        events: list[dict[str, str]] = []
+        events: list[dict[str, Any]] = []
 
-        drive_client = DriveActivityClient(sa_info)
-        events.extend(drive_client.list_activity(sheet_id, page_size=limit))
+        audit_sheet_id = runtime.get("audit_sheet_id", "") or self.settings.audit_sheet_id or ""
+        audit_worksheet_name = (
+            runtime.get("audit_worksheet_name", "") or self.settings.audit_worksheet_name or "audit_log"
+        )
 
-        audit_sheet_id = self.settings.audit_sheet_id
-        audit_worksheet_name = self.settings.audit_worksheet_name
-        # If user configured an explicit worksheet name, use it for audit source fallback.
-        if worksheet_name and not audit_worksheet_name:
-            audit_worksheet_name = worksheet_name
-
+        # Prefer audit source first for near real-time updates.
         if audit_sheet_id and audit_worksheet_name:
             try:
                 audit_client = SheetAuditClient(sa_info)
@@ -39,8 +35,13 @@ class HistoryService:
                     )
                 )
             except Exception:
-                # Optional source. DriveActivity results should still be usable.
                 pass
+
+        try:
+            drive_client = DriveActivityClient(sa_info)
+            events.extend(drive_client.list_activity(sheet_id, page_size=limit))
+        except Exception:
+            pass
 
         events.sort(key=lambda x: x.get("time", ""), reverse=True)
         return events[:limit]

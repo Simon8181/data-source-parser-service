@@ -1,3 +1,4 @@
+import json
 from typing import Any
 
 import gspread
@@ -18,10 +19,10 @@ class SheetAuditClient:
         sheet_id: str,
         worksheet_name: str,
         page_size: int = 50,
-    ) -> list[dict[str, str]]:
+    ) -> list[dict[str, Any]]:
         worksheet = self.client.open_by_key(sheet_id).worksheet(worksheet_name)
         records = worksheet.get_all_records()
-        results: list[dict[str, str]] = []
+        results: list[dict[str, Any]] = []
 
         for row in records[:page_size]:
             results.append(
@@ -30,6 +31,12 @@ class SheetAuditClient:
                     "actor": str(row.get("actor", "unknown")),
                     "action": str(row.get("action", "edit")),
                     "time": str(row.get("time", "")),
+                    "sheet_name": str(row.get("sheet_name", "")),
+                    "cell_a1": str(row.get("cell_a1", "")),
+                    "old_value": str(row.get("old_value", "")),
+                    "new_value": str(row.get("new_value", "")),
+                    "raw": row,
+                    "raw_pretty": json.dumps(row, ensure_ascii=False, indent=2),
                 }
             )
         return results

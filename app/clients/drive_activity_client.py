@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 from typing import Any
 
@@ -14,7 +15,7 @@ class DriveActivityClient:
         )
         self.client = build("driveactivity", "v2", credentials=credentials, cache_discovery=False)
 
-    def list_activity(self, file_id: str, page_size: int = 50) -> list[dict[str, str]]:
+    def list_activity(self, file_id: str, page_size: int = 50) -> list[dict[str, Any]]:
         request_body = {
             "itemName": f"items/{file_id}",
             "pageSize": page_size,
@@ -22,18 +23,25 @@ class DriveActivityClient:
         }
         response = self.client.activity().query(body=request_body).execute()
         activities = response.get("activities", [])
-        results: list[dict[str, str]] = []
+        results: list[dict[str, Any]] = []
 
         for item in activities:
             actor = self._extract_actor(item.get("actors", []))
             action = self._extract_action(item.get("primaryActionDetail", {}))
             timestamp = self._extract_timestamp(item)
+            target_title = self._extract_target_title(item.get("targets", []))
             results.append(
                 {
                     "source": "drive_activity",
                     "actor": actor,
                     "action": action,
                     "time": timestamp,
+                    "sheet_name": target_title,
+                    "cell_a1": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "raw": item,
+                    "raw_pretty": json.dumps(item, ensure_ascii=False, indent=2),
                 }
             )
         return results
@@ -52,6 +60,19 @@ class DriveActivityClient:
         if not detail:
             return "unknown"
         return next(iter(detail.keys()), "unknown")
+
+    def _extract_target_title(self, targets: list[dict[str, Any]]) -> str:
+        if not targets:
+            return ""
+        first = targets[0]
+        drive_item = first.get("driveItem") or first.get("drive", {})
+        title = drive_item.get("title", "")
+        if title:
+            return str(title)
+        name = drive_item.get("name", "")
+        if name and "/" in name:
+            return name.split("/")[-1]
+        return str(name) if name else ""
 
     def _extract_timestamp(self, activity: dict[str, Any]) -> str:
         if "timestamp" in activity:
