@@ -41,27 +41,25 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 Open:
 - `http://localhost:8000/settings`
 - Upload service account JSON, set `sheet_id` and `worksheet_name`
-- (Recommended) set `audit_sheet_id` + `audit_worksheet_name` for near real-time history
+- (Optional) set `audit_sheet_id` + `audit_worksheet_name` if you still use the `audit_ew` flow with the Python history page
 - Click `Validate current config`
 - Open `http://localhost:8000/history`
 
-## 3.1) EWid + modified time (Apps Script audit sheet)
+## 3.1) Apps Script: first four tabs — AZ column last-modified time
 
-The UI shows **only** `EWid` (column **C** on the edited row) and **ISO time** of the edit.
+The bundled script [`scripts/apps_script_audit.gs`](scripts/apps_script_audit.gs) no longer maintains an `audit_ew` sheet. It only:
 
-Edits are **not** logged when column C is empty (no EWid).
+- Applies to the **first four worksheets** in the workbook (**left-to-right tab order**, indices 0–3). Put your main data tabs first so this matches your process (e.g. quote / order / BOL / POD).
+- On any edit in those sheets, sets **column AZ** (column 52) on **every row** included in the edited range to the **same** `Date` timestamp, with display format `yyyy-MM-dd HH:mm:ss`.
 
-1. Open your target Google Sheet.
-2. Go to `Extensions` -> `Apps Script`.
-3. Paste script from `scripts/apps_script_audit.gs`.
-4. Save, grant permission when prompted.
-5. In Settings:
-   - `audit_sheet_id`: usually same as main `sheet_id`
-   - `audit_worksheet_name`: `audit_ew` (script creates this tab with columns `time`, `ew_id`)
+Setup:
 
-If audit is **not** configured, the history API falls back to Drive Activity (no EWid column).
+1. Open the Google Sheet.
+2. `Extensions` → `Apps Script`.
+3. Paste the contents of `scripts/apps_script_audit.gs` and save.
+4. Grant permissions when prompted.
 
-The old `audit_log` multi-column format is no longer used by the bundled script; use `audit_ew` for a clean two-column log.
+**Python service note:** The FastAPI `/history` feature still reads optional `audit_ew` (or Drive Activity) if configured in Settings. This AZ timestamp lives **on the row in the source tabs**; it is **not** automatically ingested by this repo unless you add a separate sync later.
 
 ## 4) API endpoints
 

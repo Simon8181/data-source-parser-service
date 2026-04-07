@@ -1,64 +1,54 @@
-var AUDIT_TAB = "audit_ew";
+/**
+ * When any of the first four worksheets (left-to-right tab order) is edited,
+ * writes the same timestamp into column AZ for every row touched by the edit.
+ * Column AZ = 52 (A=1 … Z=26, AA=27 … AZ=52).
+ */
+
+var FIRST_SHEET_COUNT = 4;
+var COL_AZ = 52;
+var TS_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 function onEdit(e) {
-  handleAuditEdit(e);
+  handleFirstFourSheetAzTimestamp(e);
 }
 
 // Compatibility entrypoint for legacy triggers named myFunction.
 function myFunction(e) {
-  handleAuditEdit(e);
+  handleFirstFourSheetAzTimestamp(e);
 }
 
-function handleAuditEdit(e) {
+function handleFirstFourSheetAzTimestamp(e) {
   try {
     if (!e || !e.range) return;
 
-    var sourceSheet = e.range.getSheet();
-    var sourceSpreadsheet = sourceSheet.getParent();
-    var sourceSheetName = sourceSheet.getName();
+    var sh = e.range.getSheet();
+    var ss = sh.getParent();
+    var sheets = ss.getSheets();
+    var idx = sheetIndex_(sheets, sh);
+    if (idx < 0 || idx >= FIRST_SHEET_COUNT) return;
 
-    if (sourceSheetName === AUDIT_TAB) return;
+    var startRow = e.range.getRow();
+    var numRows = e.range.getNumRows();
+    if (numRows < 1) return;
 
-    // EWid: display value in column C on the edited row (same as getDisplayValue in audit sheet).
-    var ewId = String(
-      sourceSheet.getRange(e.range.getRow(), 3).getDisplayValue() || ""
-    );
-    if (!ewId.trim()) return;
-
-    var auditSheet = sourceSpreadsheet.getSheetByName(AUDIT_TAB);
-    if (!auditSheet) {
-      auditSheet = sourceSpreadsheet.insertSheet(AUDIT_TAB);
-      auditSheet.appendRow(["audit_id", "time", "ew_id"]);
+    var now = new Date();
+    var values = [];
+    for (var i = 0; i < numRows; i++) {
+      values.push([now]);
     }
 
-    var auditId = Utilities.getUuid();
-    var nowIso = new Date().toISOString();
-
-    // Upsert by ew_id: same EWid => update audit_id + time only; no new row.
-    var lastRow = auditSheet.getLastRow();
-    if (lastRow <= 1) {
-      auditSheet.appendRow([auditId, nowIso, ewId]);
-      return;
-    }
-
-    var matchRow = -1;
-    for (var r = 2; r <= lastRow; r++) {
-      var existing = String(
-        auditSheet.getRange(r, 3).getDisplayValue() || ""
-      );
-      if (existing === ewId) {
-        matchRow = r;
-        break;
-      }
-    }
-
-    if (matchRow > 0) {
-      // (row, col, numRows, numColumns) — exactly one row, cols A:B
-      auditSheet.getRange(matchRow, 1, 1, 2).setValues([[auditId, nowIso]]);
-    } else {
-      auditSheet.appendRow([auditId, nowIso, ewId]);
-    }
+    var azRange = sh.getRange(startRow, COL_AZ, numRows, 1);
+    azRange.setValues(values);
+    azRange.setNumberFormat(TS_FORMAT);
   } catch (error) {
     // Keep silent to avoid user-facing interruption in sheet edits.
   }
+}
+
+function sheetIndex_(sheets, target) {
+  var id = target.getSheetId();
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].getSheetId() === id) return i;
+  }
+  return -1;
 }
