@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sheet History</title>
+</head>
+<body>
+  <h1>Sheet History</h1>
+  <p>Showing latest {{ limit }} records.</p>
+  <p><a href="/settings">Back to settings</a></p>
+  <table border="1" cellpadding="6" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Actor</th>
+        <th>Action</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for event in events %}
+      <tr>
+        <td>{{ event.time }}</td>
+        <td>{{ event.actor }}</td>
+        <td>{{ event.action }}</td>
+        <td>{{ event.source }}</td>
+      </tr>
+      {% endfor %}
+      {% if not events %}
+      <tr>
+        <td colspan="4">No history found. Please configure settings first.</td>
+      </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</body>
+</html>

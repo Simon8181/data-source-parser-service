@@ -1,0 +1,15 @@
+[Unit]
+Description=Sheet History Service
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/data-source-parser-service
+EnvironmentFile=/opt/data-source-parser-service/.env
+ExecStart=/opt/data-source-parser-service/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
