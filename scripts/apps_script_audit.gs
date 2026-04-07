@@ -19,18 +19,19 @@ function handleAuditEdit(e) {
 
     if (sourceSheetName === AUDIT_TAB) return;
 
-    // EWid: display value in column E on the edited row.
+    // EWid: display value in column C on the edited row.
     var ewId = String(
-      sourceSheet.getRange(e.range.getRow(), 5).getDisplayValue() || ""
+      sourceSheet.getRange(e.range.getRow(), 3).getDisplayValue() || ""
     );
 
     var auditSheet = sourceSpreadsheet.getSheetByName(AUDIT_TAB);
     if (!auditSheet) {
       auditSheet = sourceSpreadsheet.insertSheet(AUDIT_TAB);
-      auditSheet.appendRow(["time", "ew_id"]);
+      auditSheet.appendRow(["audit_id", "time", "ew_id"]);
     }
 
-    auditSheet.appendRow([new Date().toISOString(), ewId]);
+    var auditId = Utilities.getUuid();
+    auditSheet.appendRow([auditId, new Date().toISOString(), ewId]);
   } catch (error) {
     // Keep silent to avoid user-facing interruption in sheet edits.
   }

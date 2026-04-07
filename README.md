@@ -47,7 +47,7 @@ Open:
 
 ## 3.1) EWid + modified time (Apps Script audit sheet)
 
-The UI shows **only** `EWid` (column **E** on the edited row) and **ISO time** of the edit.
+The UI shows **only** `EWid` (column **C** on the edited row) and **ISO time** of the edit.
 
 1. Open your target Google Sheet.
 2. Go to `Extensions` -> `Apps Script`.
