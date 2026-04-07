@@ -25,14 +25,16 @@ class SheetAuditClient:
         results: list[dict[str, Any]] = []
 
         for row in records[:page_size]:
+            audit_id = str(row.get("audit_id", row.get("id", "")))
             ew_id = str(
                 row.get("ew_id", row.get("EWid", row.get("e_wid", "")))
             )
             time_val = str(row.get("time", ""))
-            minimal = {"time": time_val, "ew_id": ew_id}
+            minimal = {"audit_id": audit_id, "time": time_val, "ew_id": ew_id}
             results.append(
                 {
                     "source": "sheet_audit",
+                    "audit_id": audit_id,
                     "time": time_val,
                     "ew_id": ew_id,
                     "raw": row,

@@ -12,6 +12,7 @@
   <table border="1" cellpadding="6" cellspacing="0">
     <thead>
       <tr>
+        <th>Audit ID</th>
         <th>Modified time</th>
         <th>EWid</th>
       </tr>
@@ -19,13 +20,14 @@
     <tbody>
       {% for event in events %}
       <tr>
+        <td>{{ event.audit_id | default('', true) }}</td>
         <td>{{ event.time | default('', true) }}</td>
         <td>{{ event.ew_id | default('', true) }}</td>
       </tr>
       {% endfor %}
       {% if not events %}
       <tr>
-        <td colspan="2">
+        <td colspan="3">
           No records yet. Configure audit in Settings (audit sheet + worksheet
           <code>audit_ew</code>), paste Apps Script, then edit a data row and refresh.
         </td>
